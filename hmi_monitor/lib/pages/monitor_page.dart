@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hmi_monitor/components/speedometer.dart';
 import 'package:hmi_monitor/server/socket_server.dart';
 
 class MonitorPage extends StatefulWidget {
@@ -17,6 +18,11 @@ class _MonitorPageState extends State<MonitorPage> {
   // ignore: prefer_typing_uninitialized_variables
   late final _port;
   Map<String, dynamic> _receivedData = {};
+
+  final GlobalKey<SpeedometerState> t1 = GlobalKey<SpeedometerState>();
+  final GlobalKey<SpeedometerState> t2 = GlobalKey<SpeedometerState>();
+  final GlobalKey<SpeedometerState> t3 = GlobalKey<SpeedometerState>();
+  final GlobalKey<SpeedometerState> t4 = GlobalKey<SpeedometerState>();
 
   @override
   void initState() {
@@ -56,7 +62,31 @@ class _MonitorPageState extends State<MonitorPage> {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 20),
-              _buildJsonDisplay(_receivedData), // Display the received data
+              _buildJsonDisplay(_receivedData),
+              Row(
+                children: [
+                  Speedometer(
+                    key: t1,
+                    minSpeed: 0.0,
+                    maxSpeed: 100.0,
+                  ),
+                  Speedometer(
+                    key: t2,
+                    minSpeed: 0.0,
+                    maxSpeed: 100.0,
+                  ),
+                  Speedometer(
+                    key: t3,
+                    minSpeed: 0.0,
+                    maxSpeed: 100.0,
+                  ),
+                  Speedometer(
+                    key: t4,
+                    minSpeed: 0.0,
+                    maxSpeed: 100.0,
+                  ),
+                ],
+              )
             ],
           ),
         ),
@@ -84,6 +114,18 @@ class _MonitorPageState extends State<MonitorPage> {
         }
       } else {
         widgets.add(Text('$key: $value', style: TextStyle(fontSize: 16)));
+        if (key == 'throttle1') {
+          t1.currentState?.updateSpeed(double.parse(value.toString()));
+        }
+        if (key == 'throttle2') {
+          t2.currentState?.updateSpeed(double.parse(value.toString()));
+        }
+        if (key == 'throttle3') {
+          t3.currentState?.updateSpeed(double.parse(value.toString()));
+        }
+        if (key == 'throttle4') {
+          t4.currentState?.updateSpeed(double.parse(value.toString()));
+        }
       }
       widgets.add(SizedBox(height: 10));
     });
