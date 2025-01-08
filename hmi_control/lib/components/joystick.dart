@@ -5,8 +5,15 @@ import 'package:flutter/material.dart';
 class Joystick extends StatefulWidget {
   final double joystickSize;
   final double cursorSize;
+  final String name;
+  final Function(double, String) callback;
 
-  const Joystick({super.key, this.joystickSize = 100, this.cursorSize = 40});
+  const Joystick(
+      {super.key,
+      this.joystickSize = 100,
+      this.cursorSize = 40,
+      required this.name,
+      required this.callback});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -14,6 +21,9 @@ class Joystick extends StatefulWidget {
 }
 
 class _JoystickState extends State<Joystick> {
+  late final Function(double, String) _callback;
+  late final String _name;
+
   late final double _joystickSize;
   late final double _cursorSize;
   late Offset _handlePosition;
@@ -22,6 +32,9 @@ class _JoystickState extends State<Joystick> {
   @override
   void initState() {
     super.initState();
+    _callback = widget.callback;
+    _name = widget.name;
+
     _joystickSize = widget.joystickSize;
     _cursorSize = widget.cursorSize;
     _handlePosition = Offset(_joystickSize, _joystickSize);
@@ -39,14 +52,16 @@ class _JoystickState extends State<Joystick> {
     if (!_isDragging) return;
     setState(() {
       final Offset newPosition = details.localPosition;
+      final angle =
+          (newPosition - Offset(_joystickSize, _joystickSize)).direction;
       final double distance =
           (newPosition - Offset(_joystickSize, _joystickSize)).distance;
+
+      _callback(angle, _name);
 
       if (distance <= _joystickSize - _cursorSize) {
         _handlePosition = newPosition;
       } else {
-        final angle =
-            (newPosition - Offset(_joystickSize, _joystickSize)).direction;
         _handlePosition = Offset(
           _joystickSize + (_joystickSize - _cursorSize) * cos(angle),
           _joystickSize + (_joystickSize - _cursorSize) * sin(angle),

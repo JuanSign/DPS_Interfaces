@@ -9,13 +9,18 @@ class Throttle extends StatefulWidget {
   final double minValue;
   final double maxValue;
 
+  final String name;
+  final Function(double, String) callback;
+
   const Throttle(
       {super.key,
       this.throttleHeight = 200,
       this.handleHeight = 30,
       this.baseWidth = 70,
       this.minValue = 0,
-      this.maxValue = 100});
+      this.maxValue = 100,
+      required this.name,
+      required this.callback});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -33,18 +38,24 @@ class _ThrottleState extends State<Throttle> {
   bool _isDragging = false;
   Offset _lastDrag = Offset.zero;
 
+  late final String _name;
+  late final Function(double, String) _callback;
+
   @override
   void initState() {
     super.initState();
     _throttleHeight = widget.throttleHeight;
     _handleHeight = widget.handleHeight;
     _baseWidth = widget.baseWidth;
-    _minValue = widget.baseWidth;
-    _maxValue = widget.baseWidth;
+    _minValue = widget.minValue;
+    _maxValue = widget.maxValue;
     _center = Offset(
       _baseWidth / 2,
       (_throttleHeight - _handleHeight / 2),
     );
+
+    _name = widget.name;
+    _callback = widget.callback;
   }
 
   void _startDragging(DragStartDetails details) {
@@ -66,6 +77,11 @@ class _ThrottleState extends State<Throttle> {
 
       _center = Offset(_center.dx, newY);
       _lastDrag = details.localPosition;
+
+      final double range = (_throttleHeight - _handleHeight);
+      final double pos = (_throttleHeight - _handleHeight / 2) - _center.dy;
+      final double value = _minValue + pos / range * (_maxValue - _minValue);
+      _callback(value, _name);
     });
   }
 
